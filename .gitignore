@@ -1,0 +1,5 @@
+node_modules/
+dist/
+package-lock.json
+youtubedemo-rwcl-f6f2e16d97dd.json
+.env
