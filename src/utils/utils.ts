@@ -1,29 +1,42 @@
 import dotenv from 'dotenv';
 import fs from 'fs';
 
-interface FulfillmentMessage {
+type FulfillmentMessage = {
     platform: string;
     text: {
-      text: string[];
+        text: string[];
     };
-  }
-  
-  interface ResponseObject {
+};
+
+type OutputContext = {
+    name: string;
+    lifespanCount?: number;
+    parameters: Record<string, any>;
+};
+
+export type ResponseObject = {
     fulfillmentMessages: FulfillmentMessage[];
-  }
-  
-  function generateResponseObject(messages: string[]): ResponseObject {
+    outputContexts?: OutputContext[];
+};
+
+export function generateResponseObject(
+    messages: string[],
+    outputContexts: OutputContext[] = []
+): ResponseObject {
     const fulfillmentMessages: FulfillmentMessage[] = messages.map(message => ({
-      platform: 'FACEBOOK',
-      text: {
-        text: [message]
-      }
+        platform: 'FACEBOOK',
+        text: {
+            text: [message]
+        }
     }));
-  
-    return {
-      fulfillmentMessages
+    const response: ResponseObject = {
+        fulfillmentMessages
     };
-  }
+    if (outputContexts.length > 0) {
+        response.outputContexts = outputContexts;
+    }
+    return response;
+}
 
 export function loadEnvVariables(envPath: string = '.env'): Record<string, string> {
     if (!fs.existsSync(envPath)) {
@@ -40,4 +53,39 @@ export function loadEnvVariables(envPath: string = '.env'): Record<string, strin
         }
     }
     return envVariables;
+};
+
+type ContextTypes = {
+    name: string;
+    lifespanCount?: number;
+    parameters?: { [key: string]: any };
+};
+
+type QueryResultTypes = {
+    queryText: string;
+    action: string;
+    parameters: { [key: string]: any };
+    allRequiredParamsPresent: boolean;
+    fulfillmentMessages: any[];
+    outputContexts: ContextTypes[];
+    intent: {
+        name: string;
+        displayName: string;
+    };
+    intentDetectionConfidence: number;
+    languageCode: string;
+};
+
+type DialogflowRequestTypes = {
+    responseId: string;
+    queryResult: QueryResultTypes;
+    originalDetectIntentRequest: { source: string; payload: any };
+    session: string;
+};
+
+export function extractSessionVars(response: DialogflowRequestTypes): { [key: string]: any } | undefined {
+    const sessionVarsContext = response.queryResult.outputContexts.find(
+        (context) => context.name.endsWith('/contexts/session-vars')
+    );
+    return sessionVarsContext?.parameters;
 };
