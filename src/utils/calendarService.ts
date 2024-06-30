@@ -25,8 +25,8 @@ export type EventDetailsTypes = {
 
 const envVariables = loadEnvVariables();
 
-const serviceAccount = JSON.parse(envVariables.CREDENTIALS);
-const calendarId = envVariables.CALENDAR_ID;
+const serviceAccount: CredentialsTypes = JSON.parse(envVariables.CREDENTIALS);
+const calendarId: string = envVariables.CALENDAR_ID;
 
 const auth = new JWT({
     email: serviceAccount.client_email,

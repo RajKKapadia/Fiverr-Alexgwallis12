@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 
 import homeRouter from "./routes/homeRoute";
 import dialogflowRouter from "./routes/dialogflowRoute";
+import frontendRouter from "./routes/frontendRoute";
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ const PORT: string = process.env.PORT || '3000';
 
 app.use("/", homeRouter);
 app.use('/dialogflow', dialogflowRouter);
+app.use('/frontend', frontendRouter);
 
 app.listen(PORT, () => {
   console.log(`[server]: Server is running at http://localhost:${PORT}`);
